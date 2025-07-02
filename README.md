@@ -1,6 +1,6 @@
 # Langage de Programmation Otia
 
-Otia est un langage de programmation personnalisé conçu pour la simplicité et la facilité d'utilisation, permettant aux utilisateurs d'effectuer des opérations mathématiques, de gérer des fichiers, de créer des variables et des conditions avec une syntaxe claire.
+Otia est un langage de programmation conçu pour la simplicité et la facilité d'utilisation, permettant aux utilisateurs d'effectuer des opérations mathématiques, de gérer des fichiers, de créer des variables et des conditions avec une syntaxe claire.
 
 ## Fonctionnalités
 
