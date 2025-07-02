@@ -1,0 +1,45 @@
+Otia.mathematique {
+add = 10 + 5
+}
+
+Otia.mathematique {
+sub = 20 - 7
+}
+
+Otia.mathematique {
+mul = 6 * 4
+}
+
+Otia.mathematique {
+div = 100 / 20
+}
+
+Otia.create.fichier{
+\mon_fichier.txt
+\
+}
+
+Otia.write.fichier{
+\mon_fichier.txt('Bonjour du langage Otia !')
+\
+}
+
+Otia.read.fichier{
+\mon_fichier.txt
+\
+}
+
+Otia.create.fichier{
+\nouveau_doc.txt
+\
+}
+
+Otia.write.fichier{
+\nouveau_doc.txt('Ceci est un test supplementaire.')
+\
+}
+
+Otia.read.fichier{
+\nouveau_doc.txt
+\
+}
