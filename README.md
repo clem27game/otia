@@ -98,10 +98,6 @@ Vous pouvez créer un fichier appelé test.ot pour expérimenter avec le langage
 Otia.mathematique {
 add = 10 + 5
 }
-
-Otia.console {
-\Résultat: {add}
-}
 ```
 # Contribution
 
