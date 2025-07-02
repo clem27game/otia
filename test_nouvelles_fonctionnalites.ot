@@ -1,0 +1,60 @@
+
+Otia.console {
+\=== Test des nouvelles fonctionnalités d'Otia ===
+}
+
+Otia.console {
+\hello World
+}
+
+Otia.console {
+\Test des mathématiques avancées:
+}
+
+Otia.mathematique {
+pow = 2 ^ 3
+}
+
+Otia.mathematique {
+sqrt = 16
+}
+
+Otia.mathematique {
+cube = 3
+}
+
+Otia.mathematique {
+square = 5
+}
+
+Otia.console {
+\Test des variables:
+}
+
+Otia.variable {
+x = 10
+}
+
+Otia.variable {
+y = 20
+}
+
+Otia.console {
+\Test des conditions:
+}
+
+Otia.condition {
+if x < y
+}
+
+Otia.condition {
+if 5 == 5
+}
+
+Otia.condition {
+if x > y
+}
+
+Otia.console {
+\Test terminé !
+}

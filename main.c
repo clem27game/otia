@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <ctype.h> // Pour isspace
+#include <math.h>  // Pour sqrt
 
 // --- Fonctions utilitaires ---
 
@@ -47,6 +48,49 @@ char* extract_delimited_content(const char* line, char start_char, char end_char
     return content;
 }
 
+// --- Structures pour les variables ---
+#define MAX_VARIABLES 100
+#define MAX_VAR_NAME 50
+
+typedef struct {
+    char name[MAX_VAR_NAME];
+    int value;
+} Variable;
+
+Variable variables[MAX_VARIABLES];
+int variable_count = 0;
+
+// Fonction pour trouver une variable
+int find_variable(const char* name) {
+    for (int i = 0; i < variable_count; i++) {
+        if (strcmp(variables[i].name, name) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+// Fonction pour définir une variable
+void set_variable(const char* name, int value) {
+    int index = find_variable(name);
+    if (index != -1) {
+        variables[index].value = value;
+    } else if (variable_count < MAX_VARIABLES) {
+        strcpy(variables[variable_count].name, name);
+        variables[variable_count].value = value;
+        variable_count++;
+    }
+}
+
+// Fonction pour obtenir la valeur d'une variable
+int get_variable(const char* name) {
+    int index = find_variable(name);
+    if (index != -1) {
+        return variables[index].value;
+    }
+    return 0; // Valeur par défaut si variable non trouvée
+}
+
 // --- Fonctions pour les opérations mathématiques ---
 void execute_mathematics(const char* content_line) {
     // Supprime les espaces autour de l'opérateur et des opérandes
@@ -57,10 +101,9 @@ void execute_mathematics(const char* content_line) {
 
     int a, b;
     char op;
-    char operation_type[10]; // "add", "sub", "mul", "div"
+    char operation_type[20]; // "add", "sub", "mul", "div", "pow", "sqrt", "cube", "square"
 
-    // Recherche de l'opérateur et extraction des opérandes
-    // Exemple: "add = 4 + 5"
+    // Gestion des opérations avec deux opérandes
     if (sscanf(trimmed_content, "%s = %d %c %d", operation_type, &a, &op, &b) == 4) {
         if (strcmp(operation_type, "add") == 0 && op == '+') {
             printf("Résultat de l'addition: %d\n", a + b);
@@ -74,6 +117,24 @@ void execute_mathematics(const char* content_line) {
             } else {
                 fprintf(stderr, "Erreur: Division par zéro.\n");
             }
+        } else if (strcmp(operation_type, "pow") == 0 && op == '^') {
+            int result = 1;
+            for (int i = 0; i < b; i++) {
+                result *= a;
+            }
+            printf("Résultat de la puissance: %d\n", result);
+        } else {
+            fprintf(stderr, "Erreur: Opération mathématique ou syntaxe invalide: %s\n", trimmed_content);
+        }
+    }
+    // Gestion des opérations avec un seul opérande
+    else if (sscanf(trimmed_content, "%s = %d", operation_type, &a) == 2) {
+        if (strcmp(operation_type, "sqrt") == 0) {
+            printf("Résultat de la racine carrée: %.2f\n", sqrt(a));
+        } else if (strcmp(operation_type, "cube") == 0) {
+            printf("Résultat du cube: %d\n", a * a * a);
+        } else if (strcmp(operation_type, "square") == 0) {
+            printf("Résultat du carré: %d\n", a * a);
         } else {
             fprintf(stderr, "Erreur: Opération mathématique ou syntaxe invalide: %s\n", trimmed_content);
         }
@@ -166,6 +227,88 @@ void write_file(const char* arg_line) {
     free(content_part);
 }
 
+// --- Fonction pour l'affichage console ---
+void execute_console(const char* content_line) {
+    char temp_content[1024];
+    strncpy(temp_content, content_line, sizeof(temp_content) - 1);
+    temp_content[sizeof(temp_content) - 1] = '\0';
+    char* trimmed_content = trim_whitespace(temp_content);
+
+    // Supprime le '\' au début si présent
+    if (trimmed_content[0] == '\\') {
+        trimmed_content++;
+    }
+
+    printf("%s\n", trimmed_content);
+}
+
+// --- Fonction pour les variables ---
+void execute_variable(const char* content_line) {
+    char temp_content[1024];
+    strncpy(temp_content, content_line, sizeof(temp_content) - 1);
+    temp_content[sizeof(temp_content) - 1] = '\0';
+    char* trimmed_content = trim_whitespace(temp_content);
+
+    char var_name[MAX_VAR_NAME];
+    int value;
+
+    // Format: "variable_name = 42"
+    if (sscanf(trimmed_content, "%s = %d", var_name, &value) == 2) {
+        set_variable(var_name, value);
+        printf("Variable '%s' définie avec la valeur: %d\n", var_name, value);
+    } else {
+        fprintf(stderr, "Erreur: Syntaxe de variable invalide: %s\n", trimmed_content);
+    }
+}
+
+// --- Fonction pour les conditions ---
+void execute_condition(const char* content_line) {
+    char temp_content[1024];
+    strncpy(temp_content, content_line, sizeof(temp_content) - 1);
+    temp_content[sizeof(temp_content) - 1] = '\0';
+    char* trimmed_content = trim_whitespace(temp_content);
+
+    char var1[MAX_VAR_NAME], var2[MAX_VAR_NAME], operator[10];
+    int val1, val2;
+
+    // Format: "if variable1 == variable2" ou "if 5 > 3"
+    if (sscanf(trimmed_content, "if %s %s %s", var1, operator, var2) == 3) {
+        // Vérifier si ce sont des nombres ou des variables
+        if (isdigit(var1[0]) || var1[0] == '-') {
+            val1 = atoi(var1);
+        } else {
+            val1 = get_variable(var1);
+        }
+
+        if (isdigit(var2[0]) || var2[0] == '-') {
+            val2 = atoi(var2);
+        } else {
+            val2 = get_variable(var2);
+        }
+
+        bool condition_met = false;
+        if (strcmp(operator, "==") == 0) {
+            condition_met = (val1 == val2);
+        } else if (strcmp(operator, "!=") == 0) {
+            condition_met = (val1 != val2);
+        } else if (strcmp(operator, ">") == 0) {
+            condition_met = (val1 > val2);
+        } else if (strcmp(operator, "<") == 0) {
+            condition_met = (val1 < val2);
+        } else if (strcmp(operator, ">=") == 0) {
+            condition_met = (val1 >= val2);
+        } else if (strcmp(operator, "<=") == 0) {
+            condition_met = (val1 <= val2);
+        }
+
+        printf("Condition '%s %s %s' (%d %s %d): %s\n", 
+               var1, operator, var2, val1, operator, val2, 
+               condition_met ? "VRAIE" : "FAUSSE");
+    } else {
+        fprintf(stderr, "Erreur: Syntaxe de condition invalide: %s\n", trimmed_content);
+    }
+}
+
 // --- Fonction principale de l'interpréteur ---
 
 void interpret_otia_file(const char* filepath) {
@@ -199,6 +342,15 @@ void interpret_otia_file(const char* filepath) {
         } else if (strstr(trimmed_line, "Otia.write.fichier{")) {
             strcpy(current_command, "Otia.write.fichier");
             in_block = true;
+        } else if (strstr(trimmed_line, "Otia.console {")) {
+            strcpy(current_command, "Otia.console");
+            in_block = true;
+        } else if (strstr(trimmed_line, "Otia.variable {")) {
+            strcpy(current_command, "Otia.variable");
+            in_block = true;
+        } else if (strstr(trimmed_line, "Otia.condition {")) {
+            strcpy(current_command, "Otia.condition");
+            in_block = true;
         }
         // Détection de la fin d'un bloc
         else if (strcmp(trimmed_line, "}") == 0) {
@@ -218,6 +370,12 @@ void interpret_otia_file(const char* filepath) {
             } else if (strcmp(current_command, "Otia.write.fichier") == 0) {
                 // Cette fonction doit analyser la ligne complète pour le nom du fichier et le contenu
                 write_file(trimmed_line);
+            } else if (strcmp(current_command, "Otia.console") == 0) {
+                execute_console(trimmed_line);
+            } else if (strcmp(current_command, "Otia.variable") == 0) {
+                execute_variable(trimmed_line);
+            } else if (strcmp(current_command, "Otia.condition") == 0) {
+                execute_condition(trimmed_line);
             } else {
                 fprintf(stderr, "Avertissement: Ligne ignorée dans un bloc non géré: %s\n", trimmed_line);
             }
