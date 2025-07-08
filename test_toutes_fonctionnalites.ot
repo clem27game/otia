@@ -3,59 +3,59 @@
 
 // === MATHÉMATIQUES ÉTENDUES (1-20) ===
 Otia.mathematique {
-mod = 17 % 5
+mod = 77 % 7
 }
 
 Otia.mathematique {
-min = 15 5
+min = 78 8
 }
 
 Otia.mathematique {
-max = 15 5
+max = 95 9
 }
 
 Otia.mathematique {
-gcd = 48 18
+gcd = 23 67
 }
 
 Otia.mathematique {
-lcm = 12 8
+lcm = 15 9
 }
 
 Otia.mathematique {
-abs = -42
+abs = -78
 }
 
 Otia.mathematique {
-fact = 5
+fact = 8
 }
 
 Otia.mathematique {
-fib = 10
+fib = 7
 }
 
 Otia.mathematique {
-sin = 30
+sin = 90
 }
 
 Otia.mathematique {
-cos = 60
+cos = 78
 }
 
 Otia.mathematique {
-tan = 45
+tan = 57
 }
 
 Otia.mathematique {
-log = 10
+log = 89
 }
 
 Otia.mathematique {
-log10 = 100
+log10 = 189
 }
 
 Otia.mathematique {
-triangle_area = 3 4 5
+triangle_area = 2 3 4
 }
 
 // === GESTION DE FICHIERS AVANCÉE (21-30) ===
@@ -121,7 +121,7 @@ Otia.console.beep {
 
 // === VARIABLES ÉTENDUES (36-45) ===
 Otia.variable {
-nombre_entier = 42
+nombre_entier = 70
 }
 
 Otia.variable {
@@ -162,27 +162,27 @@ nombre_entier
 
 // === TABLEAUX (46-50) ===
 Otia.array.create {
-mon_tableau 5
+mon_tableau 7
 }
 
 Otia.array.set {
-mon_tableau[0] = 10
+mon_tableau[0] = 7
 }
 
 Otia.array.set {
-mon_tableau[1] = 30
+mon_tableau[1] = 13
 }
 
 Otia.array.set {
-mon_tableau[2] = 20
+mon_tableau[2] = 33
 }
 
 Otia.array.set {
-mon_tableau[3] = 50
+mon_tableau[3] = 82
 }
 
 Otia.array.set {
-mon_tableau[4] = 40
+mon_tableau[4] = 23
 }
 
 Otia.array.get {
@@ -209,7 +209,7 @@ Otia.system.date {
 }
 
 Otia.system.random {
-1 100
+10 200
 }
 
 Otia.system.sleep {
@@ -218,11 +218,11 @@ Otia.system.sleep {
 
 // === CONDITIONS ÉTENDUES (56-60) ===
 Otia.variable {
-a = 15
+a = 8
 }
 
 Otia.variable {
-b = 10
+b = 6
 }
 
 Otia.condition {
