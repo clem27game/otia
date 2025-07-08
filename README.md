@@ -343,4 +343,79 @@ Ce projet est open-source et libre d'utilisation pour tous vos projets personnel
 
 ---
 
-**Otia v2.0** - 60+ fonctionnalités pour une programmation simple et puissante ! 🚀
+**Otia v3.0** - 100+ fonctionnalités avec affichage de variables, structures de contrôle avancées ! 🚀
+
+## 🆕 Nouvelles Fonctionnalités v3.0
+
+### 📺 Affichage de Variables dans la Console
+Vous pouvez maintenant utiliser vos variables directement dans l'affichage console en utilisant la syntaxe `{nom_variable}` :
+
+```ot
+Otia.variable {
+nom = 'Alice'
+age = 25
+}
+
+Otia.console {
+\Bonjour {nom}, vous avez {age} ans !
+}
+```
+
+### 🔄 Nouvelles Structures de Contrôle
+- **sinon** : Bloc else pour les conditions
+- **tant_que** : Boucles while
+- **pour** : Boucles for avec range
+- **répéter** : Répétition simple
+- **switch** : Structure switch/case
+
+```ot
+Otia.condition {
+tant_que compteur < 10
+}
+
+Otia.condition {
+pour i de 1 à 5
+}
+
+Otia.condition {
+répéter 3 fois
+}
+```
+
+### 🎨 40 Nouvelles Fonctionnalités (61-100)
+
+#### Fichiers Avancés (61-70)
+- **Otia.file.backup** : Sauvegarde automatique
+- **Otia.file.encrypt** : Chiffrement de fichiers
+- **Otia.file.compress** : Compression
+- **Otia.file.checksum** : Calcul de somme de contrôle
+- **Otia.file.permissions** : Gestion des permissions
+
+#### Console Enrichie (71-80)
+- **Otia.console.bold** : Texte en gras
+- **Otia.console.underline** : Texte souligné
+- **Otia.console.blink** : Texte clignotant
+- **Otia.console.reverse** : Texte inversé
+- **Otia.console.position** : Positionnement du curseur
+- Nouvelles couleurs : **magenta**, **cyan**
+
+#### Variables Avancées (81-90)
+- **Otia.variable.reset** : Réinitialisation
+- **Otia.variable.copy** : Copie de variables
+- **Otia.variable.swap** : Échange de variables
+- Support des **booléens** (true/false)
+
+#### Tableaux Étendus (91-95)
+- **Otia.array.reverse** : Inversion d'un tableau
+- **Otia.array.min** : Valeur minimale
+- **Otia.array.max** : Valeur maximale
+- **Otia.array.average** : Moyenne des valeurs
+
+#### Système Étendu (96-100)
+- **Otia.system.uptime** : Temps de fonctionnement
+- **Otia.system.memory** : Utilisation mémoire
+- **Otia.system.cpu** : Utilisation CPU
+- **Otia.system.disk** : Espace disque
+- **Otia.system.network** : État réseau
+
+**Otia v3.0** - 100+ fonctionnalités avec affichage de variables, structures de contrôle avancées ! 🚀

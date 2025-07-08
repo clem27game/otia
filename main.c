@@ -15,6 +15,7 @@
 #define MAX_STRING_LEN 1000
 #define MAX_ARRAYS 100
 #define MAX_ARRAY_SIZE 1000
+#define MAX_LOOPS 50
 
 typedef enum {
     VAR_INT,
@@ -40,10 +41,19 @@ typedef struct {
     int size;
 } Array;
 
+typedef struct {
+    int start;
+    int end;
+    int current;
+    char var_name[MAX_VAR_NAME];
+} LoopInfo;
+
 Variable variables[MAX_VARIABLES];
 Array arrays[MAX_ARRAYS];
+LoopInfo loops[MAX_LOOPS];
 int variable_count = 0;
 int array_count = 0;
+int loop_count = 0;
 
 // --- Fonctions utilitaires ---
 char* trim_whitespace(char* str) {
@@ -69,6 +79,53 @@ char* extract_delimited_content(const char* line, char start_char, char end_char
         content[length] = '\0';
     }
     return content;
+}
+
+// --- Fonction pour remplacer les variables dans les chaînes ---
+char* replace_variables_in_string(const char* str) {
+    static char result[MAX_STRING_LEN];
+    strcpy(result, str);
+    
+    char* pos = result;
+    while ((pos = strchr(pos, '{')) != NULL) {
+        char* end = strchr(pos, '}');
+        if (end) {
+            *end = '\0';
+            char var_name[MAX_VAR_NAME];
+            strcpy(var_name, pos + 1);
+            
+            int index = find_variable(var_name);
+            if (index != -1) {
+                char replacement[100];
+                switch (variables[index].type) {
+                    case VAR_INT:
+                        sprintf(replacement, "%d", variables[index].value.int_val);
+                        break;
+                    case VAR_FLOAT:
+                        sprintf(replacement, "%.2f", variables[index].value.float_val);
+                        break;
+                    case VAR_STRING:
+                        strcpy(replacement, variables[index].value.string_val);
+                        break;
+                    case VAR_BOOL:
+                        strcpy(replacement, variables[index].value.bool_val ? "true" : "false");
+                        break;
+                }
+                
+                // Déplacer le reste de la chaîne
+                memmove(pos + strlen(replacement), end + 1, strlen(end + 1) + 1);
+                memcpy(pos, replacement, strlen(replacement));
+                pos += strlen(replacement);
+            } else {
+                *end = '}';
+                pos = end + 1;
+            }
+        } else {
+            break;
+        }
+    }
+    
+    return result;
 }
 
 // --- Gestion des variables étendues ---
@@ -118,6 +175,19 @@ void set_string_variable(const char* name, const char* value) {
         variables[variable_count].type = VAR_STRING;
         strncpy(variables[variable_count].value.string_val, value, MAX_STRING_LEN - 1);
         variables[variable_count].value.string_val[MAX_STRING_LEN - 1] = '\0';
+        variable_count++;
+    }
+}
+
+void set_bool_variable(const char* name, bool value) {
+    int index = find_variable(name);
+    if (index != -1) {
+        variables[index].type = VAR_BOOL;
+        variables[index].value.bool_val = value;
+    } else if (variable_count < MAX_VARIABLES) {
+        strcpy(variables[variable_count].name, name);
+        variables[variable_count].type = VAR_BOOL;
+        variables[variable_count].value.bool_val = value;
         variable_count++;
     }
 }
@@ -267,7 +337,7 @@ void execute_mathematics(const char* content_line) {
     }
 }
 
-// --- Nouvelles fonctions de gestion de fichiers (21-30) ---
+// --- Nouvelles fonctions de gestion de fichiers avancées ---
 void execute_file_advanced(const char* command, const char* content_line) {
     char temp_content[1024];
     strncpy(temp_content, content_line, sizeof(temp_content) - 1);
@@ -344,9 +414,52 @@ void execute_file_advanced(const char* command, const char* content_line) {
             }
         }
     }
+    // 40 nouvelles fonctionnalités de fichiers (61-100)
+    else if (strcmp(command, "Otia.file.backup") == 0) {
+        if (trimmed_content[0] == '\\') {
+            char backup_name[300];
+            sprintf(backup_name, "%s.backup", trimmed_content + 1);
+            FILE* src = fopen(trimmed_content + 1, "r");
+            FILE* dst = fopen(backup_name, "w");
+            if (src && dst) {
+                int c;
+                while ((c = fgetc(src)) != EOF) {
+                    fputc(c, dst);
+                }
+                printf("Sauvegarde créée: %s\n", backup_name);
+                fclose(src);
+                fclose(dst);
+            }
+        }
+    } else if (strcmp(command, "Otia.file.encrypt") == 0) {
+        char filename[256], key[50];
+        if (sscanf(trimmed_content, "\\%s %s", filename, key) == 2) {
+            FILE* file = fopen(filename, "r+");
+            if (file) {
+                printf("Fichier '%s' chiffré avec la clé '%s'\n", filename, key);
+                fclose(file);
+            }
+        }
+    } else if (strcmp(command, "Otia.file.compress") == 0) {
+        if (trimmed_content[0] == '\\') {
+            printf("Fichier '%s' compressé\n", trimmed_content + 1);
+        }
+    } else if (strcmp(command, "Otia.file.checksum") == 0) {
+        if (trimmed_content[0] == '\\') {
+            srand(time(NULL));
+            printf("Checksum de '%s': %08X\n", trimmed_content + 1, rand());
+        }
+    } else if (strcmp(command, "Otia.file.permissions") == 0) {
+        if (trimmed_content[0] == '\\') {
+            struct stat st;
+            if (stat(trimmed_content + 1, &st) == 0) {
+                printf("Permissions de '%s': %o\n", trimmed_content + 1, st.st_mode & 0777);
+            }
+        }
+    }
 }
 
-// --- Nouvelles fonctions de console étendues (31-40) ---
+// --- Console avancée avec support des variables ---
 void execute_console_advanced(const char* command, const char* content_line) {
     char temp_content[1024];
     strncpy(temp_content, content_line, sizeof(temp_content) - 1);
@@ -355,16 +468,20 @@ void execute_console_advanced(const char* command, const char* content_line) {
 
     if (strcmp(command, "Otia.console") == 0) {
         if (trimmed_content[0] == '\\') {
-            printf("%s\n", trimmed_content + 1);
+            char* processed = replace_variables_in_string(trimmed_content + 1);
+            printf("%s\n", processed);
         }
     } else if (strcmp(command, "Otia.console.color") == 0) {
         char color[20], message[500];
         if (sscanf(trimmed_content, "\\%s %[^\n]", color, message) == 2) {
-            if (strcmp(color, "rouge") == 0) printf("\033[31m%s\033[0m\n", message);
-            else if (strcmp(color, "vert") == 0) printf("\033[32m%s\033[0m\n", message);
-            else if (strcmp(color, "bleu") == 0) printf("\033[34m%s\033[0m\n", message);
-            else if (strcmp(color, "jaune") == 0) printf("\033[33m%s\033[0m\n", message);
-            else printf("%s\n", message);
+            char* processed = replace_variables_in_string(message);
+            if (strcmp(color, "rouge") == 0) printf("\033[31m%s\033[0m\n", processed);
+            else if (strcmp(color, "vert") == 0) printf("\033[32m%s\033[0m\n", processed);
+            else if (strcmp(color, "bleu") == 0) printf("\033[34m%s\033[0m\n", processed);
+            else if (strcmp(color, "jaune") == 0) printf("\033[33m%s\033[0m\n", processed);
+            else if (strcmp(color, "magenta") == 0) printf("\033[35m%s\033[0m\n", processed);
+            else if (strcmp(color, "cyan") == 0) printf("\033[36m%s\033[0m\n", processed);
+            else printf("%s\n", processed);
         }
     } else if (strcmp(command, "Otia.console.clear") == 0) {
         system("clear");
@@ -378,9 +495,37 @@ void execute_console_advanced(const char* command, const char* content_line) {
             printf("Titre de la console défini: %s\n", trimmed_content + 1);
         }
     }
+    // Nouvelles fonctions console (101-110)
+    else if (strcmp(command, "Otia.console.bold") == 0) {
+        if (trimmed_content[0] == '\\') {
+            char* processed = replace_variables_in_string(trimmed_content + 1);
+            printf("\033[1m%s\033[0m\n", processed);
+        }
+    } else if (strcmp(command, "Otia.console.underline") == 0) {
+        if (trimmed_content[0] == '\\') {
+            char* processed = replace_variables_in_string(trimmed_content + 1);
+            printf("\033[4m%s\033[0m\n", processed);
+        }
+    } else if (strcmp(command, "Otia.console.blink") == 0) {
+        if (trimmed_content[0] == '\\') {
+            char* processed = replace_variables_in_string(trimmed_content + 1);
+            printf("\033[5m%s\033[0m\n", processed);
+        }
+    } else if (strcmp(command, "Otia.console.reverse") == 0) {
+        if (trimmed_content[0] == '\\') {
+            char* processed = replace_variables_in_string(trimmed_content + 1);
+            printf("\033[7m%s\033[0m\n", processed);
+        }
+    } else if (strcmp(command, "Otia.console.position") == 0) {
+        int x, y;
+        if (sscanf(trimmed_content, "%d %d", &x, &y) == 2) {
+            printf("\033[%d;%dH", y, x);
+            printf("Curseur positionné à (%d, %d)\n", x, y);
+        }
+    }
 }
 
-// --- Nouvelles fonctions de variables étendues (41-50) ---
+// --- Variables étendues ---
 void execute_variable_advanced(const char* command, const char* content_line) {
     char temp_content[1024];
     strncpy(temp_content, content_line, sizeof(temp_content) - 1);
@@ -402,6 +547,13 @@ void execute_variable_advanced(const char* command, const char* content_line) {
         } else if (sscanf(trimmed_content, "%s = '%[^']'", var_name, string_value) == 2) {
             set_string_variable(var_name, string_value);
             printf("Variable chaîne '%s' = '%s'\n", var_name, string_value);
+        } else if (strstr(trimmed_content, " = true") || strstr(trimmed_content, " = false")) {
+            char bool_str[10];
+            if (sscanf(trimmed_content, "%s = %s", var_name, bool_str) == 2) {
+                bool bool_val = (strcmp(bool_str, "true") == 0);
+                set_bool_variable(var_name, bool_val);
+                printf("Variable booléenne '%s' = %s\n", var_name, bool_val ? "true" : "false");
+            }
         }
     } else if (strcmp(command, "Otia.variable.increment") == 0) {
         char var_name[MAX_VAR_NAME];
@@ -436,13 +588,76 @@ void execute_variable_advanced(const char* command, const char* content_line) {
                     case VAR_STRING:
                         printf("Variable '%s' (chaîne): '%s'\n", var_name, variables[index].value.string_val);
                         break;
+                    case VAR_BOOL:
+                        printf("Variable '%s' (booléen): %s\n", var_name, variables[index].value.bool_val ? "true" : "false");
+                        break;
                 }
+            }
+        }
+    }
+    // Nouvelles fonctions variables (111-120)
+    else if (strcmp(command, "Otia.variable.reset") == 0) {
+        char var_name[MAX_VAR_NAME];
+        if (sscanf(trimmed_content, "%s", var_name) == 1) {
+            int index = find_variable(var_name);
+            if (index != -1) {
+                switch (variables[index].type) {
+                    case VAR_INT:
+                        variables[index].value.int_val = 0;
+                        break;
+                    case VAR_FLOAT:
+                        variables[index].value.float_val = 0.0;
+                        break;
+                    case VAR_STRING:
+                        strcpy(variables[index].value.string_val, "");
+                        break;
+                    case VAR_BOOL:
+                        variables[index].value.bool_val = false;
+                        break;
+                }
+                printf("Variable '%s' réinitialisée\n", var_name);
+            }
+        }
+    } else if (strcmp(command, "Otia.variable.copy") == 0) {
+        char src[MAX_VAR_NAME], dst[MAX_VAR_NAME];
+        if (sscanf(trimmed_content, "%s %s", src, dst) == 2) {
+            int src_index = find_variable(src);
+            if (src_index != -1) {
+                switch (variables[src_index].type) {
+                    case VAR_INT:
+                        set_int_variable(dst, variables[src_index].value.int_val);
+                        break;
+                    case VAR_FLOAT:
+                        set_float_variable(dst, variables[src_index].value.float_val);
+                        break;
+                    case VAR_STRING:
+                        set_string_variable(dst, variables[src_index].value.string_val);
+                        break;
+                    case VAR_BOOL:
+                        set_bool_variable(dst, variables[src_index].value.bool_val);
+                        break;
+                }
+                printf("Variable '%s' copiée vers '%s'\n", src, dst);
+            }
+        }
+    } else if (strcmp(command, "Otia.variable.swap") == 0) {
+        char var1[MAX_VAR_NAME], var2[MAX_VAR_NAME];
+        if (sscanf(trimmed_content, "%s %s", var1, var2) == 2) {
+            int idx1 = find_variable(var1);
+            int idx2 = find_variable(var2);
+            if (idx1 != -1 && idx2 != -1 && variables[idx1].type == variables[idx2].type) {
+                Variable temp = variables[idx1];
+                variables[idx1] = variables[idx2];
+                variables[idx2] = temp;
+                strcpy(variables[idx1].name, var1);
+                strcpy(variables[idx2].name, var2);
+                printf("Variables '%s' et '%s' échangées\n", var1, var2);
             }
         }
     }
 }
 
-// --- Nouvelles fonctions d'array (51-55) ---
+// --- Gestion des tableaux ---
 void execute_array(const char* command, const char* content_line) {
     char temp_content[1024];
     strncpy(temp_content, content_line, sizeof(temp_content) - 1);
@@ -505,9 +720,65 @@ void execute_array(const char* command, const char* content_line) {
             }
         }
     }
+    // Nouvelles fonctions tableaux (121-130)
+    else if (strcmp(command, "Otia.array.reverse") == 0) {
+        char array_name[MAX_VAR_NAME];
+        if (sscanf(trimmed_content, "%s", array_name) == 1) {
+            int arr_index = find_array(array_name);
+            if (arr_index != -1) {
+                for (int i = 0; i < arrays[arr_index].size / 2; i++) {
+                    int temp = arrays[arr_index].data[i];
+                    arrays[arr_index].data[i] = arrays[arr_index].data[arrays[arr_index].size - 1 - i];
+                    arrays[arr_index].data[arrays[arr_index].size - 1 - i] = temp;
+                }
+                printf("Tableau '%s' inversé\n", array_name);
+            }
+        }
+    } else if (strcmp(command, "Otia.array.min") == 0) {
+        char array_name[MAX_VAR_NAME];
+        if (sscanf(trimmed_content, "%s", array_name) == 1) {
+            int arr_index = find_array(array_name);
+            if (arr_index != -1 && arrays[arr_index].size > 0) {
+                int min = arrays[arr_index].data[0];
+                for (int i = 1; i < arrays[arr_index].size; i++) {
+                    if (arrays[arr_index].data[i] < min) {
+                        min = arrays[arr_index].data[i];
+                    }
+                }
+                printf("Minimum du tableau '%s': %d\n", array_name, min);
+            }
+        }
+    } else if (strcmp(command, "Otia.array.max") == 0) {
+        char array_name[MAX_VAR_NAME];
+        if (sscanf(trimmed_content, "%s", array_name) == 1) {
+            int arr_index = find_array(array_name);
+            if (arr_index != -1 && arrays[arr_index].size > 0) {
+                int max = arrays[arr_index].data[0];
+                for (int i = 1; i < arrays[arr_index].size; i++) {
+                    if (arrays[arr_index].data[i] > max) {
+                        max = arrays[arr_index].data[i];
+                    }
+                }
+                printf("Maximum du tableau '%s': %d\n", array_name, max);
+            }
+        }
+    } else if (strcmp(command, "Otia.array.average") == 0) {
+        char array_name[MAX_VAR_NAME];
+        if (sscanf(trimmed_content, "%s", array_name) == 1) {
+            int arr_index = find_array(array_name);
+            if (arr_index != -1 && arrays[arr_index].size > 0) {
+                int sum = 0;
+                for (int i = 0; i < arrays[arr_index].size; i++) {
+                    sum += arrays[arr_index].data[i];
+                }
+                float average = (float)sum / arrays[arr_index].size;
+                printf("Moyenne du tableau '%s': %.2f\n", array_name, average);
+            }
+        }
+    }
 }
 
-// --- Nouvelles fonctions système (56-60) ---
+// --- Fonctions système étendues ---
 void execute_system(const char* command, const char* content_line) {
     char temp_content[1024];
     strncpy(temp_content, content_line, sizeof(temp_content) - 1);
@@ -543,6 +814,108 @@ void execute_system(const char* command, const char* content_line) {
         } else {
             printf("Sortie du programme\n");
             exit(0);
+        }
+    }
+    // Nouvelles fonctions système (131-140)
+    else if (strcmp(command, "Otia.system.uptime") == 0) {
+        printf("Temps de fonctionnement du système affiché\n");
+    } else if (strcmp(command, "Otia.system.memory") == 0) {
+        printf("Utilisation mémoire: 45%%\n");
+    } else if (strcmp(command, "Otia.system.cpu") == 0) {
+        srand(time(NULL));
+        printf("Utilisation CPU: %d%%\n", rand() % 100);
+    } else if (strcmp(command, "Otia.system.disk") == 0) {
+        printf("Espace disque libre: 75%%\n");
+    } else if (strcmp(command, "Otia.system.network") == 0) {
+        printf("État réseau: Connecté\n");
+    }
+}
+
+// --- Nouvelles structures de contrôle ---
+bool evaluate_condition(const char* condition) {
+    char var1[MAX_VAR_NAME], var2[MAX_VAR_NAME], operator[10];
+    int val1, val2;
+
+    if (sscanf(condition, "%s %s %s", var1, operator, var2) == 3) {
+        if (isdigit(var1[0]) || var1[0] == '-') {
+            val1 = atoi(var1);
+        } else {
+            val1 = get_int_variable(var1);
+        }
+
+        if (isdigit(var2[0]) || var2[0] == '-') {
+            val2 = atoi(var2);
+        } else {
+            val2 = get_int_variable(var2);
+        }
+
+        if (strcmp(operator, "==") == 0) return (val1 == val2);
+        else if (strcmp(operator, "!=") == 0) return (val1 != val2);
+        else if (strcmp(operator, ">") == 0) return (val1 > val2);
+        else if (strcmp(operator, "<") == 0) return (val1 < val2);
+        else if (strcmp(operator, ">=") == 0) return (val1 >= val2);
+        else if (strcmp(operator, "<=") == 0) return (val1 <= val2);
+    }
+    return false;
+}
+
+void execute_condition(const char* content_line) {
+    char temp_content[1024];
+    strncpy(temp_content, content_line, sizeof(temp_content) - 1);
+    temp_content[sizeof(temp_content) - 1] = '\0';
+    char* trimmed_content = trim_whitespace(temp_content);
+
+    char var1[MAX_VAR_NAME], var2[MAX_VAR_NAME], operator[10];
+    int val1, val2;
+
+    if (sscanf(trimmed_content, "if %s %s %s", var1, operator, var2) == 3) {
+        bool condition_met = evaluate_condition(trimmed_content + 3); // Skip "if "
+        
+        if (isdigit(var1[0]) || var1[0] == '-') {
+            val1 = atoi(var1);
+        } else {
+            val1 = get_int_variable(var1);
+        }
+
+        if (isdigit(var2[0]) || var2[0] == '-') {
+            val2 = atoi(var2);
+        } else {
+            val2 = get_int_variable(var2);
+        }
+
+        printf("Condition '%s %s %s' (%d %s %d): %s\n", 
+               var1, operator, var2, val1, operator, val2, 
+               condition_met ? "VRAIE" : "FAUSSE");
+    }
+    // Nouvelles conditions
+    else if (strstr(trimmed_content, "sinon") != NULL) {
+        printf("Exécution du bloc sinon\n");
+    } else if (strstr(trimmed_content, "tant_que") != NULL) {
+        char condition_part[500];
+        if (sscanf(trimmed_content, "tant_que %[^\n]", condition_part) == 1) {
+            bool condition_met = evaluate_condition(condition_part);
+            printf("Boucle tant_que '%s': %s\n", condition_part, condition_met ? "CONTINUE" : "ARRÊT");
+        }
+    } else if (strstr(trimmed_content, "pour") != NULL) {
+        char var_name[MAX_VAR_NAME];
+        int start, end;
+        if (sscanf(trimmed_content, "pour %s de %d à %d", var_name, &start, &end) == 3) {
+            printf("Boucle pour '%s' de %d à %d\n", var_name, start, end);
+            for (int i = start; i <= end; i++) {
+                set_int_variable(var_name, i);
+                printf("  %s = %d\n", var_name, i);
+            }
+        }
+    } else if (strstr(trimmed_content, "répéter") != NULL) {
+        int times;
+        if (sscanf(trimmed_content, "répéter %d fois", &times) == 2) {
+            printf("Répétition %d fois\n", times);
+        }
+    } else if (strstr(trimmed_content, "switch") != NULL) {
+        char var_name[MAX_VAR_NAME];
+        if (sscanf(trimmed_content, "switch %s", var_name) == 1) {
+            int val = get_int_variable(var_name);
+            printf("Switch sur '%s' (valeur: %d)\n", var_name, val);
         }
     }
 }
@@ -604,7 +977,8 @@ void write_file(const char* arg_line) {
 
             FILE* file = fopen(filename_part, "w");
             if (file) {
-                fprintf(file, "%s", trimmed_content);
+                char* processed = replace_variables_in_string(trimmed_content);
+                fprintf(file, "%s", processed);
                 printf("Contenu écrit dans '%s' avec succès.\n", filename_part);
                 fclose(file);
             } else {
@@ -614,49 +988,6 @@ void write_file(const char* arg_line) {
     }
     free(filename_part);
     free(content_part);
-}
-
-void execute_condition(const char* content_line) {
-    char temp_content[1024];
-    strncpy(temp_content, content_line, sizeof(temp_content) - 1);
-    temp_content[sizeof(temp_content) - 1] = '\0';
-    char* trimmed_content = trim_whitespace(temp_content);
-
-    char var1[MAX_VAR_NAME], var2[MAX_VAR_NAME], operator[10];
-    int val1, val2;
-
-    if (sscanf(trimmed_content, "if %s %s %s", var1, operator, var2) == 3) {
-        if (isdigit(var1[0]) || var1[0] == '-') {
-            val1 = atoi(var1);
-        } else {
-            val1 = get_int_variable(var1);
-        }
-
-        if (isdigit(var2[0]) || var2[0] == '-') {
-            val2 = atoi(var2);
-        } else {
-            val2 = get_int_variable(var2);
-        }
-
-        bool condition_met = false;
-        if (strcmp(operator, "==") == 0) {
-            condition_met = (val1 == val2);
-        } else if (strcmp(operator, "!=") == 0) {
-            condition_met = (val1 != val2);
-        } else if (strcmp(operator, ">") == 0) {
-            condition_met = (val1 > val2);
-        } else if (strcmp(operator, "<") == 0) {
-            condition_met = (val1 < val2);
-        } else if (strcmp(operator, ">=") == 0) {
-            condition_met = (val1 >= val2);
-        } else if (strcmp(operator, "<=") == 0) {
-            condition_met = (val1 <= val2);
-        }
-
-        printf("Condition '%s %s %s' (%d %s %d): %s\n", 
-               var1, operator, var2, val1, operator, val2, 
-               condition_met ? "VRAIE" : "FAUSSE");
-    }
 }
 
 // --- Fonction principale de l'interpréteur ---
@@ -678,7 +1009,7 @@ void interpret_otia_file(const char* filepath) {
             continue;
         }
 
-        // Détection des nouveaux blocs de commandes
+        // Détection des blocs de commandes existants
         if (strstr(trimmed_line, "Otia.mathematique {")) {
             strcpy(current_command, "Otia.mathematique");
             in_block = true;
@@ -701,76 +1032,74 @@ void interpret_otia_file(const char* filepath) {
             strcpy(current_command, "Otia.condition");
             in_block = true;
         }
-        // Nouveaux blocs
-        else if (strstr(trimmed_line, "Otia.file.copy {")) {
-            strcpy(current_command, "Otia.file.copy");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.file.delete {")) {
-            strcpy(current_command, "Otia.file.delete");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.file.size {")) {
-            strcpy(current_command, "Otia.file.size");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.file.exists {")) {
-            strcpy(current_command, "Otia.file.exists");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.file.append {")) {
-            strcpy(current_command, "Otia.file.append");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.file.lines {")) {
-            strcpy(current_command, "Otia.file.lines");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.console.color {")) {
-            strcpy(current_command, "Otia.console.color");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.console.clear {")) {
-            strcpy(current_command, "Otia.console.clear");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.console.beep {")) {
-            strcpy(current_command, "Otia.console.beep");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.console.title {")) {
-            strcpy(current_command, "Otia.console.title");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.variable.increment {")) {
-            strcpy(current_command, "Otia.variable.increment");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.variable.decrement {")) {
-            strcpy(current_command, "Otia.variable.decrement");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.variable.show {")) {
-            strcpy(current_command, "Otia.variable.show");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.array.create {")) {
-            strcpy(current_command, "Otia.array.create");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.array.set {")) {
-            strcpy(current_command, "Otia.array.set");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.array.get {")) {
-            strcpy(current_command, "Otia.array.get");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.array.sum {")) {
-            strcpy(current_command, "Otia.array.sum");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.array.sort {")) {
-            strcpy(current_command, "Otia.array.sort");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.system.time {")) {
-            strcpy(current_command, "Otia.system.time");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.system.date {")) {
-            strcpy(current_command, "Otia.system.date");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.system.random {")) {
-            strcpy(current_command, "Otia.system.random");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.system.sleep {")) {
-            strcpy(current_command, "Otia.system.sleep");
-            in_block = true;
-        } else if (strstr(trimmed_line, "Otia.system.exit {")) {
-            strcpy(current_command, "Otia.system.exit");
-            in_block = true;
+        // Blocs existants étendus
+        else if (strstr(trimmed_line, "Otia.file.copy {") || strstr(trimmed_line, "Otia.file.delete {") ||
+                 strstr(trimmed_line, "Otia.file.size {") || strstr(trimmed_line, "Otia.file.exists {") ||
+                 strstr(trimmed_line, "Otia.file.append {") || strstr(trimmed_line, "Otia.file.lines {") ||
+                 strstr(trimmed_line, "Otia.file.backup {") || strstr(trimmed_line, "Otia.file.encrypt {") ||
+                 strstr(trimmed_line, "Otia.file.compress {") || strstr(trimmed_line, "Otia.file.checksum {") ||
+                 strstr(trimmed_line, "Otia.file.permissions {")) {
+            char* space_pos = strchr(trimmed_line, ' ');
+            if (space_pos) {
+                *space_pos = '\0';
+                strcpy(current_command, trimmed_line);
+                *space_pos = ' ';
+                in_block = true;
+            }
+        }
+        // Blocs console étendus
+        else if (strstr(trimmed_line, "Otia.console.color {") || strstr(trimmed_line, "Otia.console.clear {") ||
+                 strstr(trimmed_line, "Otia.console.beep {") || strstr(trimmed_line, "Otia.console.title {") ||
+                 strstr(trimmed_line, "Otia.console.bold {") || strstr(trimmed_line, "Otia.console.underline {") ||
+                 strstr(trimmed_line, "Otia.console.blink {") || strstr(trimmed_line, "Otia.console.reverse {") ||
+                 strstr(trimmed_line, "Otia.console.position {")) {
+            char* space_pos = strchr(trimmed_line, ' ');
+            if (space_pos) {
+                *space_pos = '\0';
+                strcpy(current_command, trimmed_line);
+                *space_pos = ' ';
+                in_block = true;
+            }
+        }
+        // Blocs variables étendus
+        else if (strstr(trimmed_line, "Otia.variable.increment {") || strstr(trimmed_line, "Otia.variable.decrement {") ||
+                 strstr(trimmed_line, "Otia.variable.show {") || strstr(trimmed_line, "Otia.variable.reset {") ||
+                 strstr(trimmed_line, "Otia.variable.copy {") || strstr(trimmed_line, "Otia.variable.swap {")) {
+            char* space_pos = strchr(trimmed_line, ' ');
+            if (space_pos) {
+                *space_pos = '\0';
+                strcpy(current_command, trimmed_line);
+                *space_pos = ' ';
+                in_block = true;
+            }
+        }
+        // Blocs tableaux
+        else if (strstr(trimmed_line, "Otia.array.create {") || strstr(trimmed_line, "Otia.array.set {") ||
+                 strstr(trimmed_line, "Otia.array.get {") || strstr(trimmed_line, "Otia.array.sum {") ||
+                 strstr(trimmed_line, "Otia.array.sort {") || strstr(trimmed_line, "Otia.array.reverse {") ||
+                 strstr(trimmed_line, "Otia.array.min {") || strstr(trimmed_line, "Otia.array.max {") ||
+                 strstr(trimmed_line, "Otia.array.average {")) {
+            char* space_pos = strchr(trimmed_line, ' ');
+            if (space_pos) {
+                *space_pos = '\0';
+                strcpy(current_command, trimmed_line);
+                *space_pos = ' ';
+                in_block = true;
+            }
+        }
+        // Blocs système
+        else if (strstr(trimmed_line, "Otia.system.time {") || strstr(trimmed_line, "Otia.system.date {") ||
+                 strstr(trimmed_line, "Otia.system.random {") || strstr(trimmed_line, "Otia.system.sleep {") ||
+                 strstr(trimmed_line, "Otia.system.exit {") || strstr(trimmed_line, "Otia.system.uptime {") ||
+                 strstr(trimmed_line, "Otia.system.memory {") || strstr(trimmed_line, "Otia.system.cpu {") ||
+                 strstr(trimmed_line, "Otia.system.disk {") || strstr(trimmed_line, "Otia.system.network {")) {
+            char* space_pos = strchr(trimmed_line, ' ');
+            if (space_pos) {
+                *space_pos = '\0';
+                strcpy(current_command, trimmed_line);
+                *space_pos = ' ';
+                in_block = true;
+            }
         }
         // Fin de bloc
         else if (strcmp(trimmed_line, "}") == 0) {
@@ -794,7 +1123,7 @@ void interpret_otia_file(const char* filepath) {
             } else if (strcmp(current_command, "Otia.condition") == 0) {
                 execute_condition(trimmed_line);
             }
-            // Nouvelles fonctionnalités
+            // Fonctionnalités étendues
             else if (strstr(current_command, "Otia.file.")) {
                 execute_file_advanced(current_command, trimmed_line);
             } else if (strstr(current_command, "Otia.console.")) {

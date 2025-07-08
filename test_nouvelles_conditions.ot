@@ -1,0 +1,218 @@
+
+// Test des nouvelles structures de contrôle et affichage de variables
+
+// === Test des variables dans la console ===
+Otia.variable {
+nom = 'Alice'
+}
+
+Otia.variable {
+age = 25
+}
+
+Otia.variable {
+score = 89.5
+}
+
+Otia.console {
+\Bonjour {nom}, vous avez {age} ans et un score de {score}
+}
+
+// === Test des nouvelles conditions ===
+Otia.variable {
+a = 10
+}
+
+Otia.variable {
+b = 5
+}
+
+// Condition IF classique
+Otia.condition {
+if a > b
+}
+
+// Condition SINON
+Otia.condition {
+sinon
+}
+
+// Boucle TANT_QUE
+Otia.condition {
+tant_que a > 0
+}
+
+// Boucle POUR
+Otia.condition {
+pour i de 1 à 5
+}
+
+// Répétition
+Otia.condition {
+répéter 3 fois
+}
+
+// Switch
+Otia.condition {
+switch a
+}
+
+// === Test des nouvelles fonctionnalités de fichiers ===
+Otia.create.fichier{
+\test_backup.txt
+}
+
+Otia.write.fichier{
+\test_backup.txt('Fichier à sauvegarder avec {nom}')
+}
+
+Otia.file.backup {
+\test_backup.txt
+}
+
+Otia.file.encrypt {
+\test_backup.txt cle123
+}
+
+Otia.file.compress {
+\test_backup.txt
+}
+
+Otia.file.checksum {
+\test_backup.txt
+}
+
+Otia.file.permissions {
+\test_backup.txt
+}
+
+// === Test des nouvelles fonctionnalités console ===
+Otia.console.bold {
+\Texte en gras avec variable: {nom}
+}
+
+Otia.console.underline {
+\Texte souligné avec âge: {age}
+}
+
+Otia.console.color {
+\magenta Message magenta avec score: {score}
+}
+
+Otia.console.color {
+\cyan Message cyan
+}
+
+Otia.console.blink {
+\Texte clignotant
+}
+
+Otia.console.reverse {
+\Texte inversé
+}
+
+Otia.console.position {
+10 5
+}
+
+// === Test des nouvelles fonctionnalités variables ===
+Otia.variable {
+test_var = 42
+}
+
+Otia.variable.reset {
+test_var
+}
+
+Otia.variable.show {
+test_var
+}
+
+Otia.variable {
+var1 = 100
+}
+
+Otia.variable {
+var2 = 200
+}
+
+Otia.variable.copy {
+var1 var_copie
+}
+
+Otia.variable.show {
+var_copie
+}
+
+Otia.variable.swap {
+var1 var2
+}
+
+Otia.variable.show {
+var1
+}
+
+Otia.variable.show {
+var2
+}
+
+// === Test des nouvelles fonctionnalités tableaux ===
+Otia.array.create {
+test_array 5
+}
+
+Otia.array.set {
+test_array[0] = 50
+}
+
+Otia.array.set {
+test_array[1] = 30
+}
+
+Otia.array.set {
+test_array[2] = 70
+}
+
+Otia.array.set {
+test_array[3] = 10
+}
+
+Otia.array.set {
+test_array[4] = 90
+}
+
+Otia.array.reverse {
+test_array
+}
+
+Otia.array.min {
+test_array
+}
+
+Otia.array.max {
+test_array
+}
+
+Otia.array.average {
+test_array
+}
+
+// === Test des nouvelles fonctionnalités système ===
+Otia.system.uptime {
+}
+
+Otia.system.memory {
+}
+
+Otia.system.cpu {
+}
+
+Otia.system.disk {
+}
+
+Otia.system.network {
+}
+
+Otia.console {
+\Test terminé! Merci {nom}!
+}
