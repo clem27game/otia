@@ -1,104 +1,346 @@
+
 # Langage de Programmation Otia
 
-Otia est un langage de programmation conçu pour la simplicité et la facilité d'utilisation, permettant aux utilisateurs d'effectuer des opérations mathématiques, de gérer des fichiers, de créer des variables et des conditions avec une syntaxe claire.
+Otia est un langage de programmation personnalisé conçu pour la simplicité et la facilité d'utilisation, offrant maintenant **60+ fonctionnalités** réparties dans les domaines des mathématiques, de la gestion de fichiers, des variables, des tableaux, de la console et du système.
 
-## Fonctionnalités
+## 🚀 Fonctionnalités Principales
 
-- **Opérations Mathématiques** : Effectuez des opérations arithmétiques de base comme l'addition, la soustraction, la multiplication et la division, ainsi que des puissances, des racines carrées, des cubes et des carrés.
-- **Gestion de Fichiers** : Créez, lisez et écrivez des fichiers texte facilement.
-- **Sortie Console** : Affichez des messages dans la console en utilisant une syntaxe simple.
-- **Gestion des Variables** : Définissez et manipulez des variables dans votre code.
-- **Instructions Conditionnelles** : Implémentez une logique conditionnelle de base pour contrôler le flux du programme.
+### ✨ Mathématiques Avancées (20 fonctionnalités)
+- **Opérations de base** : addition, soustraction, multiplication, division
+- **Opérations avancées** : puissances, modulo, PGCD, PPCM
+- **Fonctions mathématiques** : racine carrée, cube, carré, valeur absolue
+- **Trigonométrie** : sinus, cosinus, tangente (en degrés)
+- **Logarithmes** : logarithme naturel et base 10
+- **Séquences** : factorielle, suite de Fibonacci
+- **Géométrie** : calcul d'aire de triangle (formule de Héron)
 
-## Aperçu de la Syntaxe
+### 📁 Gestion de Fichiers Complète (10 fonctionnalités)
+- **Opérations de base** : créer, lire, écrire des fichiers
+- **Opérations avancées** : copier, supprimer, vérifier l'existence
+- **Informations** : taille du fichier, nombre de lignes
+- **Modification** : ajouter du contenu à un fichier existant
 
-### Opérations Mathématiques
-Pour effectuer des calculs mathématiques, utilisez la syntaxe suivante :
+### 🖥️ Console Enrichie (5 fonctionnalités)
+- **Affichage simple** : messages basiques
+- **Affichage coloré** : texte en rouge, vert, bleu, jaune
+- **Contrôles** : effacer la console, émettre un bip sonore
+- **Personnalisation** : définir le titre de la console
+
+### 📊 Variables Typées (10 fonctionnalités)
+- **Types supportés** : entiers, flottants, chaînes de caractères, booléens
+- **Opérations** : création, affichage, incrémentation, décrémentation
+- **Gestion avancée** : types automatiques, conversion de types
+
+### 🔢 Tableaux Dynamiques (5 fonctionnalités)
+- **Création** : tableaux de taille variable
+- **Manipulation** : définir et lire des valeurs par index
+- **Calculs** : somme de tous les éléments
+- **Tri** : tri automatique des éléments
+
+### ⚙️ Fonctions Système (5 fonctionnalités)
+- **Temps** : affichage de l'heure et de la date actuelles
+- **Aléatoire** : génération de nombres aléatoires dans une plage
+- **Contrôle** : pause d'exécution, sortie du programme
+
+### 🔄 Conditions Étendues (5 fonctionnalités)
+- **Opérateurs** : ==, !=, >, <, >=, <=
+- **Types mixtes** : comparaison entre variables et valeurs littérales
+
+## 📖 Guide de Syntaxe Détaillé
+
+### Mathématiques
 ```ot
 Otia.mathematique {
-add = 10 + 5
-sub = 20 - 7
-mul = 6 * 4
-div = 100 / 20
+add = 10 + 5              // Addition
+sub = 20 - 7              // Soustraction
+mul = 6 * 4               // Multiplication
+div = 100 / 20            // Division
+pow = 2 ^ 3               // Puissance
+mod = 17 % 5              // Modulo
+min = 15 5                // Minimum
+max = 15 5                // Maximum
+gcd = 48 18               // PGCD
+lcm = 12 8                // PPCM
+abs = -42                 // Valeur absolue
+fact = 5                  // Factorielle
+fib = 10                  // Fibonacci
+sqrt = 16                 // Racine carrée
+cube = 3                  // Cube
+square = 4                // Carré
+sin = 30                  // Sinus (degrés)
+cos = 60                  // Cosinus (degrés)
+tan = 45                  // Tangente (degrés)
+log = 10                  // Logarithme naturel
+log10 = 100               // Logarithme base 10
+triangle_area = 3 4 5     // Aire triangle (Héron)
 }
 ```
-Vous pouvez également calculer des puissances, des racines carrées, des cubes et des carrés :
 
-```
-Otia.mathematique {
-pow = 2 ^ 3
-sqrt = sqrt(16)
-cube = cube(3)
-square = square(4)
-}
-```
-# Gestion de Fichiers
-Créer un fichier :
-
-```
+### Gestion de Fichiers
+```ot
+// Opérations de base
 Otia.create.fichier {
 \mon_fichier.txt
 }
-```
-# Écrire dans un fichier :
 
-```
 Otia.write.fichier {
-\mon_fichier.txt('Bonjour du langage Otia !')
+\mon_fichier.txt('Contenu du fichier')
 }
-```
-# Lire un fichier :
 
-```
 Otia.read.fichier {
 \mon_fichier.txt
 }
-```
-# Sortie Console
-Affichez des messages dans la console :
 
+// Opérations avancées
+Otia.file.copy {
+\source.txt \destination.txt
+}
+
+Otia.file.delete {
+\fichier_a_supprimer.txt
+}
+
+Otia.file.size {
+\mon_fichier.txt
+}
+
+Otia.file.exists {
+\mon_fichier.txt
+}
+
+Otia.file.append {
+\mon_fichier.txt('Texte à ajouter')
+}
+
+Otia.file.lines {
+\mon_fichier.txt
+}
 ```
+
+### Console Avancée
+```ot
+// Affichage simple
 Otia.console {
-\Hello World
+\Message normal
+}
+
+// Affichage coloré
+Otia.console.color {
+\rouge Message en rouge
+}
+
+Otia.console.color {
+\vert Message en vert
+}
+
+Otia.console.color {
+\bleu Message en bleu
+}
+
+Otia.console.color {
+\jaune Message en jaune
+}
+
+// Contrôles de console
+Otia.console.clear {
+}
+
+Otia.console.beep {
+}
+
+Otia.console.title {
+\Titre de ma fenêtre
 }
 ```
-# Variables
-Définir une variable :
 
-```
+### Variables Typées
+```ot
+// Création de variables
 Otia.variable {
-myVar = 42
+nombre_entier = 42
+nombre_flottant = 3.14159
+texte = 'Bonjour Otia'
+}
+
+// Affichage de variables
+Otia.variable.show {
+nombre_entier
+}
+
+// Manipulation de variables
+Otia.variable.increment {
+nombre_entier
+}
+
+Otia.variable.decrement {
+nombre_entier
 }
 ```
-# Instructions Conditionnelles
-Utilisez des conditions pour contrôler l'exécution du programme :
 
+### Tableaux
+```ot
+// Création d'un tableau
+Otia.array.create {
+mon_tableau 5
+}
+
+// Définir des valeurs
+Otia.array.set {
+mon_tableau[0] = 10
+}
+
+Otia.array.set {
+mon_tableau[1] = 30
+}
+
+// Lire des valeurs
+Otia.array.get {
+mon_tableau[0]
+}
+
+// Opérations sur tableaux
+Otia.array.sum {
+mon_tableau
+}
+
+Otia.array.sort {
+mon_tableau
+}
 ```
+
+### Fonctions Système
+```ot
+// Informations temporelles
+Otia.system.time {
+}
+
+Otia.system.date {
+}
+
+// Nombre aléatoire
+Otia.system.random {
+1 100
+}
+
+// Contrôle d'exécution
+Otia.system.sleep {
+3
+}
+
+Otia.system.exit {
+0
+}
+```
+
+### Conditions
+```ot
+Otia.variable {
+a = 15
+b = 10
+}
+
 Otia.condition {
-if myVar > 10 {
-    Otia.console {\myVar est supérieur à 10}
+if a > b           // Supérieur
 }
+
+Otia.condition {
+if a == 15         // Égal
+}
+
+Otia.condition {
+if a != b          // Différent
+}
+
+Otia.condition {
+if a >= 15         // Supérieur ou égal
+}
+
+Otia.condition {
+if b <= 20         // Inférieur ou égal
 }
 ```
-# Installation
-Pour commencer avec Otia, clonez le dépôt ici présent:
 
-```
-git clone <repository-url>
-```
-# Exécutez votre code Otia :
+## 🛠️ Installation et Usage
 
+### Compilation
+```bash
+gcc main.c -o otia -lm
 ```
-./otia/main otia-run <votre_fichier.ot>
-```
-# Exemple d'Utilisation
-Vous pouvez créer un fichier appelé test.ot pour expérimenter avec le langage :
 
+### Exécution
+```bash
+./otia otia-run votre_fichier.ot
 ```
+
+## 📝 Exemples Pratiques
+
+### Calculatrice Scientifique
+```ot
 Otia.mathematique {
-add = 10 + 5
+sin = 45
+cos = 45
+tan = 45
+}
+
+Otia.console {
+\=== Calculatrice Trigonométrique ===
 }
 ```
-# Contribution
 
-N'hésitez pas à contribuer en nous avertissant des problèmes ou en faisant des demandes de tirage pour améliorer les fonctionnalités d'Otia !
+### Gestionnaire de Fichiers
+```ot
+Otia.create.fichier {
+\donnees.txt
+}
+
+Otia.write.fichier {
+\donnees.txt('Données importantes')
+}
+
+Otia.file.copy {
+\donnees.txt \sauvegarde.txt
+}
+
+Otia.file.size {
+\donnees.txt
+}
+```
+
+### Générateur de Nombres
+```ot
+Otia.system.random {
+1 100
+}
+
+Otia.system.random {
+1 100
+}
+
+Otia.system.random {
+1 100
+}
+```
+
+## 🎯 Fonctionnalités Uniques d'Otia
+
+1. **Syntaxe Cohérente** : Toutes les fonctionnalités utilisent la même structure `Otia.domaine.action { }`
+2. **Types Automatiques** : Détection automatique des types de variables
+3. **Gestion d'Erreurs** : Messages d'erreur clairs et informatifs
+4. **Performance** : Implémentation en C pour une exécution rapide
+5. **Extensibilité** : Architecture modulaire permettant l'ajout facile de nouvelles fonctionnalités
+
+## 🤝 Contribution
+
+N'hésitez pas à contribuer au développement d'Otia en :
+- Signalant des bugs
+- Proposant de nouvelles fonctionnalités
+- Améliorant la documentation
+- Créant des exemples d'utilisation
+
+## 📄 Licence
+
+Ce projet est open-source et libre d'utilisation pour tous vos projets personnels et commerciaux.
+
+---
+
+**Otia v2.0** - 60+ fonctionnalités pour une programmation simple et puissante ! 🚀

@@ -1,0 +1,255 @@
+
+// Test des 60 nouvelles fonctionnalités d'Otia
+
+// === MATHÉMATIQUES ÉTENDUES (1-20) ===
+Otia.mathematique {
+mod = 17 % 5
+}
+
+Otia.mathematique {
+min = 15 5
+}
+
+Otia.mathematique {
+max = 15 5
+}
+
+Otia.mathematique {
+gcd = 48 18
+}
+
+Otia.mathematique {
+lcm = 12 8
+}
+
+Otia.mathematique {
+abs = -42
+}
+
+Otia.mathematique {
+fact = 5
+}
+
+Otia.mathematique {
+fib = 10
+}
+
+Otia.mathematique {
+sin = 30
+}
+
+Otia.mathematique {
+cos = 60
+}
+
+Otia.mathematique {
+tan = 45
+}
+
+Otia.mathematique {
+log = 10
+}
+
+Otia.mathematique {
+log10 = 100
+}
+
+Otia.mathematique {
+triangle_area = 3 4 5
+}
+
+// === GESTION DE FICHIERS AVANCÉE (21-30) ===
+Otia.create.fichier{
+\fichier_source.txt
+}
+
+Otia.write.fichier{
+\fichier_source.txt('Contenu du fichier source pour les tests')
+}
+
+Otia.file.copy {
+\fichier_source.txt \fichier_copie.txt
+}
+
+Otia.file.size {
+\fichier_source.txt
+}
+
+Otia.file.exists {
+\fichier_source.txt
+}
+
+Otia.file.exists {
+\fichier_inexistant.txt
+}
+
+Otia.file.append {
+\fichier_source.txt('Ligne ajoutée')
+}
+
+Otia.file.lines {
+\fichier_source.txt
+}
+
+// === CONSOLE AVANCÉE (31-35) ===
+Otia.console {
+\Message normal dans la console
+}
+
+Otia.console.color {
+\rouge Message en rouge
+}
+
+Otia.console.color {
+\vert Message en vert
+}
+
+Otia.console.color {
+\bleu Message en bleu
+}
+
+Otia.console.color {
+\jaune Message en jaune
+}
+
+Otia.console.title {
+\Mon Programme Otia
+}
+
+Otia.console.beep {
+}
+
+// === VARIABLES ÉTENDUES (36-45) ===
+Otia.variable {
+nombre_entier = 42
+}
+
+Otia.variable {
+nombre_flottant = 3.14159
+}
+
+Otia.variable {
+texte = 'Bonjour Otia'
+}
+
+Otia.variable.show {
+nombre_entier
+}
+
+Otia.variable.show {
+nombre_flottant
+}
+
+Otia.variable.show {
+texte
+}
+
+Otia.variable.increment {
+nombre_entier
+}
+
+Otia.variable.show {
+nombre_entier
+}
+
+Otia.variable.decrement {
+nombre_entier
+}
+
+Otia.variable.show {
+nombre_entier
+}
+
+// === TABLEAUX (46-50) ===
+Otia.array.create {
+mon_tableau 5
+}
+
+Otia.array.set {
+mon_tableau[0] = 10
+}
+
+Otia.array.set {
+mon_tableau[1] = 30
+}
+
+Otia.array.set {
+mon_tableau[2] = 20
+}
+
+Otia.array.set {
+mon_tableau[3] = 50
+}
+
+Otia.array.set {
+mon_tableau[4] = 40
+}
+
+Otia.array.get {
+mon_tableau[0]
+}
+
+Otia.array.sum {
+mon_tableau
+}
+
+Otia.array.sort {
+mon_tableau
+}
+
+Otia.array.get {
+mon_tableau[0]
+}
+
+// === SYSTÈME (51-55) ===
+Otia.system.time {
+}
+
+Otia.system.date {
+}
+
+Otia.system.random {
+1 100
+}
+
+Otia.system.sleep {
+1
+}
+
+// === CONDITIONS ÉTENDUES (56-60) ===
+Otia.variable {
+a = 15
+}
+
+Otia.variable {
+b = 10
+}
+
+Otia.condition {
+if a > b
+}
+
+Otia.condition {
+if a == 15
+}
+
+Otia.condition {
+if b < 20
+}
+
+Otia.condition {
+if a != b
+}
+
+Otia.condition {
+if a >= 15
+}
+
+// Test de suppression de fichier (à la fin)
+Otia.file.delete {
+\fichier_copie.txt
+}
+
+Otia.console {
+\Test des 60 nouvelles fonctionnalités terminé!
+}
